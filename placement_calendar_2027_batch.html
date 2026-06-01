@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2027 Batch — India Placement Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1e28;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0;
+    --text2: #8b90a0;
+    --text3: #555b6e;
+    --accent: #6c8bff;
+    --accent2: #3dffa0;
+    --warn: #ffb547;
+    --danger: #ff5f5f;
+    --green: #3dffa0;
+    --green-bg: rgba(61,255,160,0.08);
+    --blue-bg: rgba(108,139,255,0.08);
+    --warn-bg: rgba(255,181,71,0.08);
+    --danger-bg: rgba(255,95,95,0.08);
+    --font: 'Sora', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .page-header {
+    padding: 48px 32px 32px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .page-header::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: -60px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(108,139,255,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .page-header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; right: 60px;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(61,255,160,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .header-tag::before {
+    content: '';
+    width: 20px; height: 1px;
+    background: var(--accent);
+  }
+  h1 {
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #e8eaf0 30%, #6c8bff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header-sub {
+    color: var(--text2);
+    font-size: 13px;
+    max-width: 560px;
+  }
+  .header-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .header-chip {
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    font-family: var(--mono);
+  }
+  .header-chip.active {
+    background: var(--blue-bg);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ── STATS ── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .stat {
+    background: var(--bg);
+    padding: 20px 24px;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--text3);
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin-bottom: 6px;
+  }
+  .stat-val {
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .stat-val.green { color: var(--green); }
+  .stat-val.danger { color: var(--danger); }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .tab-btn {
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 14px 18px;
+    border: none;
+    background: transparent;
+    color: var(--text3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all .2s;
+    letter-spacing: .01em;
+  }
+  .tab-btn:hover { color: var(--text2); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── CONTENT ── */
+  .content { padding: 28px 32px 60px; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── PHASE CARD ── */
+  .phase-wrap { margin-bottom: 20px; }
+  .phase-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .phase-hdr {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    cursor: pointer;
+    background: var(--surface);
+    transition: background .15s;
+    user-select: none;
+  }
+  .phase-hdr:hover { background: var(--surface2); }
+  .phase-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 6px;
+    letter-spacing: .06em;
+    flex-shrink: 0;
+  }
+  .ph1 { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(255,95,95,0.2); }
+  .ph2 { background: var(--warn-bg); color: var(--warn); border: 1px solid rgba(255,181,71,0.2); }
+  .ph3 { background: var(--blue-bg); color: var(--accent); border: 1px solid rgba(108,139,255,0.2); }
+  .ph4 { background: rgba(139,144,160,0.08); color: var(--text2); border: 1px solid var(--border2); }
+  .phase-title { flex: 1; font-size: 14px; font-weight: 500; color: var(--text); }
+  .phase-meta { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+  .chev { font-size: 14px; color: var(--text3); transition: transform .25s; }
+  .chev.open { transform: rotate(180deg); }
+  .phase-body { overflow: hidden; max-height: 0; transition: max-height .35s ease; }
+  .phase-body.open { max-height: 4000px; }
+  .phase-note {
+    padding: 10px 18px;
+    font-size: 12px;
+    color: var(--text2);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .note-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); margin-top: 5px; flex-shrink: 0; }
+
+  /* ── TABLE ── */
+  table.dt { width: 100%; border-collapse: collapse; }
+  table.dt thead th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text3);
+    font-family: var(--mono);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  table.dt tbody tr { border-bottom: 1px solid var(--border); transition: background .12s; }
+  table.dt tbody tr:last-child { border-bottom: none; }
+  table.dt tbody tr:hover { background: var(--surface); }
+  table.dt td { padding: 12px 14px; vertical-align: middle; }
+  .co-cell { display: flex; align-items: center; gap: 10px; }
+  .co-logo {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 600;
+    font-family: var(--mono);
+    flex-shrink: 0;
+    border: 1px solid var(--border2);
+  }
+  .co-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .co-loc { font-size: 11px; color: var(--text3); margin-top: 1px; }
+  .role-name { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .sal-pill {
+    display: inline-block;
+    font-size: 11px;
+    font-family: var(--mono);
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: var(--green-bg);
+    color: var(--green);
+    border: 1px solid rgba(61,255,160,0.15);
+  }
+  .batch-tag { font-size: 11px; color: var(--text3); margin-top: 3px; }
+  .dl-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-family: var(--mono);
+    padding: 4px 9px;
+    border-radius: 7px;
+    white-space: nowrap;
+  }
+  .dl-urgent { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(255,95,95,0.2); }
+  .dl-open   { background: var(--green-bg);  color: var(--green);  border: 1px solid rgba(61,255,160,0.2); }
+  .dl-soon   { background: var(--warn-bg);   color: var(--warn);   border: 1px solid rgba(255,181,71,0.2); }
+  .dl-est    { background: rgba(139,144,160,0.07); color: var(--text2); border: 1px solid var(--border2); }
+  .apply-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-family: var(--mono);
+    padding: 6px 13px;
+    border-radius: 8px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--accent);
+    text-decoration: none;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .apply-btn:hover { background: var(--blue-bg); border-color: var(--accent); }
+
+  /* ── TIMELINE ── */
+  .tl-item {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .tl-item:last-child { border-bottom: none; }
+  .tl-left {
+    width: 120px; flex-shrink: 0;
+    padding: 16px 14px;
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 5px;
+  }
+  .tl-month { font-size: 12px; font-weight: 500; font-family: var(--mono); color: var(--text); }
+  .tl-now { font-size: 10px; padding: 2px 7px; border-radius: 5px; background: var(--danger-bg); color: var(--danger); display: inline-block; width: fit-content; font-family: var(--mono); }
+  .tl-right { flex: 1; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 7px; align-content: flex-start; }
+  .tl-event {
+    font-size: 12px;
+    padding: 5px 11px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text2);
+    cursor: default;
+  }
+  .tl-event.hot   { background: var(--danger-bg); border-color: rgba(255,95,95,0.2);   color: #ff8080; }
+  .tl-event.mass  { background: var(--green-bg);  border-color: rgba(61,255,160,0.2);  color: var(--green); }
+  .tl-event.prod  { background: var(--warn-bg);   border-color: rgba(255,181,71,0.2);  color: var(--warn); }
+
+  /* ── QUICK LINKS ── */
+  .links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; margin-top: 20px; }
+  .link-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    text-decoration: none;
+    transition: all .15s;
+  }
+  .link-card:hover { border-color: var(--accent); background: var(--blue-bg); }
+  .link-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    flex-shrink: 0;
+    border: 1px solid var(--border2);
+  }
+  .link-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .link-domain { font-size: 11px; font-family: var(--mono); color: var(--text3); }
+  .link-arr { margin-left: auto; font-size: 13px; color: var(--text3); }
+
+  /* ── SECTION HEADING ── */
+  .sec-heading {
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--text3);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 20px 32px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--text3);
+  }
+
+  @media (max-width: 700px) {
+    .stats { grid-template-columns: repeat(2,1fr); }
+    h1 { font-size: 22px; }
+    .content { padding: 20px 16px 50px; }
+    .tabs { padding: 0 16px; overflow-x: auto; }
+    .page-header { padding: 32px 16px 24px; }
+    table.dt thead th:nth-child(3),
+    table.dt td:nth-child(3) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="header-tag">India Off-Campus Placement</div>
+  <h1>2027 Batch Placement Calendar</h1>
+  <p class="header-sub">All drives, official apply links, expected deadlines & month-by-month timeline · Saved May 2026</p>
+  <div class="header-chips">
+    <span class="header-chip active">22 companies</span>
+    <span class="header-chip active">4 phases</span>
+    <span class="header-chip">Jun 2026 → May 2027</span>
+    <span class="header-chip">All links verified</span>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="stat"><div class="stat-label">Total drives</div><div class="stat-val">22</div></div>
+  <div class="stat"><div class="stat-label">Open now</div><div class="stat-val green">4</div></div>
+  <div class="stat"><div class="stat-label">Urgent ≤60 days</div><div class="stat-val danger">3</div></div>
+  <div class="stat"><div class="stat-label">Avg package</div><div class="stat-val">₹8.4L</div></div>
+</div>
+
+<nav class="tabs">
+  <button class="tab-btn active" onclick="sw('drives',this)">All drives + links</button>
+  <button class="tab-btn" onclick="sw('timeline',this)">Month-by-month</button>
+  <button class="tab-btn" onclick="sw('portals',this)">Quick portals</button>
+</nav>
+
+<div class="content">
+
+<!-- ══ TAB: DRIVES ══ -->
+<div id="tab-drives" class="tab-panel active">
+
+  <!-- Phase 1 -->
+  <div class="phase-wrap">
+    <div class="phase-card">
+      <div class="phase-hdr" onclick="tog('p1',this)">
+        <span class="phase-badge ph1">Phase 1</span>
+        <span class="phase-title">Summer Internships — PPO route</span>
+        <span class="phase-meta">May – Aug 2026 · 6 companies</span>
+        <span class="chev">▾</span>
+      </div>
+      <div class="phase-body open" id="p1">
+        <div class="phase-note"><span class="note-dot"></span>Act NOW — Amazon & Microsoft open by Aug 2026 for Summer 2027. Google's window is only 2–4 weeks in Oct. PPO conversion rates above 70% at Amazon & Microsoft.</div>
+        <table class="dt">
+          <thead><tr><th>Company</th><th>Role & Package</th><th>Deadline</th><th>Apply</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(255,95,95,0.1);color:#ff8080">AMZ</div><div><div class="co-name">Amazon</div><div class="co-loc">Bengaluru, Hyderabad, Chennai</div></div></div></td>
+              <td><div class="role-name">SDE Intern — Summer 2027</div><span class="sal-pill">₹50k–1L/mo</span><div class="batch-tag">Batch: 2027 (pre-final) · CS/IT/ECE</div></td>
+              <td><span class="dl-chip dl-urgent">⚠ Jul–Aug 2026</span></td>
+              <td><a class="apply-btn" href="https://www.amazon.jobs/en/teams/internships-for-students" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(108,139,255,0.1);color:#6c8bff">MSF</div><div><div class="co-name">Microsoft</div><div class="co-loc">Hyderabad, Bengaluru, Noida</div></div></div></td>
+              <td><div class="role-name">SWE / Research Intern (+PPO)</div><span class="sal-pill">₹50k–80k/mo</span><div class="batch-tag">Batch: 2026–2027 · CS/IT</div></td>
+              <td><span class="dl-chip dl-urgent">⚠ Aug–Sep 2026</span></td>
+              <td><a class="apply-btn" href="https://careers.microsoft.com/students/us/en/india-internship" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(255,95,95,0.1);color:#ff8080">GOO</div><div><div class="co-name">Google</div><div class="co-loc">Bengaluru, Hyderabad</div></div></div></td>
+              <td><div class="role-name">SWE Intern / STEP Intern</div><span class="sal-pill">₹60k–90k/mo</span><div class="batch-tag">Batch: 2027 · Strong DSA required</div></td>
+              <td><span class="dl-chip dl-urgent">⚠ Oct 2026 · 2–4 wks only!</span></td>
+              <td><a class="apply-btn" href="https://careers.google.com/students/" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(108,139,255,0.1);color:#6c8bff">WMT</div><div><div class="co-name">Walmart Labs</div><div class="co-loc">Bengaluru, Chennai</div></div></div></td>
+              <td><div class="role-name">Software Engineer Intern</div><span class="sal-pill">₹40k–60k/mo</span><div class="batch-tag">Batch: 2025–2027 · Java/Python</div></td>
+              <td><span class="dl-chip dl-soon">◷ Aug–Oct 2026</span></td>
+              <td><a class="apply-btn" href="https://careers.walmart.com/results?q=intern+India" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(108,139,255,0.1);color:#6c8bff">CSC</div><div><div class="co-name">Cisco</div><div class="co-loc">Bengaluru, Hyderabad</div></div></div></td>
+              <td><div class="role-name">Apprentice — Technical Graduate</div><span class="sal-pill">₹25k–40k/mo</span><div class="batch-tag">Batch: 2027 · CS/IT/ECE</div></td>
+              <td><span class="dl-chip dl-open">✓ Rolling</span></td>
+              <td><a class="apply-btn" href="https://jobs.cisco.com/jobs/SearchJobs/India" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(61,255,160,0.1);color:#3dffa0">PHI</div><div><div class="co-name">Philips</div><div class="co-loc">Bengaluru</div></div></div></td>
+              <td><div class="role-name">SW Developer Trainee Intern</div><span class="sal-pill">₹20k–35k/mo</span><div class="batch-tag">Batch: 2024–2027</div></td>
+              <td><span class="dl-chip dl-open">✓ Rolling</span></td>
+              <td><a class="apply-btn" href="https://www.careers.philips.com/global/en/search-results?keywords=intern+India" target="_blank">Apply ↗</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 2 -->
+  <div class="phase-wrap">
+    <div class="phase-card">
+      <div class="phase-hdr" onclick="tog('p2',this)">
+        <span class="phase-badge ph2">Phase 2</span>
+        <span class="phase-title">Early Off-Campus Drives — register the day portals open</span>
+        <span class="phase-meta">Jul – Oct 2026 · 4 companies</span>
+        <span class="chev">▾</span>
+      </div>
+      <div class="phase-body" id="p2">
+        <div class="phase-note"><span class="note-dot"></span>Mass IT companies open registration 2–3 months before exams. Register on day 1 — TCS iON exam centre slots fill within days. Wipro & Capgemini use Superset platform.</div>
+        <table class="dt">
+          <thead><tr><th>Company</th><th>Role & Package</th><th>Deadline</th><th>Apply</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(61,255,160,0.1);color:#3dffa0">TCS</div><div><div class="co-name">TCS</div><div class="co-loc">Pan India — iON centres</div></div></div></td>
+              <td><div class="role-name">NQT — Ninja / Digital / Prime</div><span class="sal-pill">₹3.36–9 LPA</span><div class="batch-tag">Batch: 2027 · BE/BTech/MCA – 60%</div></td>
+              <td><span class="dl-chip dl-est">📅 Aug–Sep 2026 (est.)</span></td>
+              <td><a class="apply-btn" href="https://nextstep.tcs.com/campus/" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(61,255,160,0.1);color:#3dffa0">WIP</div><div><div class="co-name">Wipro</div><div class="co-loc">Bengaluru, Hyderabad, Chennai</div></div></div></td>
+              <td><div class="role-name">Developer L1 / Elite NTH</div><span class="sal-pill">₹3.5–6 LPA</span><div class="batch-tag">Batch: 2027 · Any branch – 60%</div></td>
+              <td><span class="dl-chip dl-est">📅 Jul–Sep 2026 (est.)</span></td>
+              <td><a class="apply-btn" href="https://careers.wipro.com/careers-home/" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(139,144,160,0.12);color:#8b90a0">CAP</div><div><div class="co-name">Capgemini</div><div class="co-loc">Pan India via Superset</div></div></div></td>
+              <td><div class="role-name">Software Engineer — Exceller</div><span class="sal-pill">₹4.25–7.5 LPA</span><div class="batch-tag">Batch: 2027 · BE/BTech – 60%</div></td>
+              <td><span class="dl-chip dl-est">📅 Aug–Sep 2026 (est.)</span></td>
+              <td><a class="apply-btn" href="https://www.capgemini.com/in-en/careers/find-your-career/" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(61,255,160,0.1);color:#3dffa0">HCL</div><div><div class="co-name">HCL Tech</div><div class="co-loc">Noida, Chennai, Hyderabad, Bengaluru</div></div></div></td>
+              <td><div class="role-name">Graduate Engineer Trainee</div><span class="sal-pill">₹3.5–5 LPA</span><div class="batch-tag">Batch: 2027 · BE/BTech – 60%</div></td>
+              <td><span class="dl-chip dl-est">📅 Aug–Oct 2026 (est.)</span></td>
+              <td><a class="apply-btn" href="https://www.hcltech.com/careers" target="_blank">Apply ↗</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 3 -->
+  <div class="phase-wrap">
+    <div class="phase-card">
+      <div class="phase-hdr" onclick="tog('p3',this)">
+        <span class="phase-badge ph3">Phase 3</span>
+        <span class="phase-title">Peak Placement Season — final year drives</span>
+        <span class="phase-meta">Oct 2026 – Jan 2027 · 11 companies</span>
+        <span class="chev">▾</span>
+      </div>
+      <div class="phase-body" id="p3">
+        <div class="phase-note"><span class="note-dot"></span>Highest hiring volume. Complete InfyTQ certification before Oct 2026 — it is mandatory for Infosys drives. Razorpay / PhonePe / Freshworks often close within days of opening.</div>
+        <table class="dt">
+          <thead><tr><th>Company</th><th>Role & Package</th><th>Deadline</th><th>Apply</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(108,139,255,0.1);color:#6c8bff">INFY</div><div><div class="co-name">Infosys</div><div class="co-loc">Bengaluru, Hyderabad, Pune, Chennai</div></div></div></td>
+              <td><div class="role-name">DSE Trainee / SP L1–L3</div><span class="sal-pill">₹6.25–21 LPA</span><div class="batch-tag">Batch: 2027 · BE/BTech/MCA – eligible branches</div></td>
+              <td><span class="dl-chip dl-est">📅 Nov 2026–Jan 2027 (est.)</span></td>
+              <td><a class="apply-btn" href="https://infytq.infosys.com/" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(108,139,255,0.1);color:#6c8bff">CTS</div><div><div class="co-name">Cognizant</div><div class="co-loc">Pan India</div></div></div></td>
+              <td><div class="role-name">GenC / GenC Next (Digital Nurture 5.0)</div><span class="sal-pill">₹4–7 LPA</span><div class="batch-tag">Batch: 2027 · BE/BTech (eligible branches)</div></td>
+              <td><span class="dl-chip dl-est">📅 Oct–Nov 2026 (est.)</span></td>
+              <td><a class="apply-btn" href="https://careers.cognizant.com/global/en/students-freshers-jobs" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(108,139,255,0.1);color:#6c8bff">ACN</div><div><div class="co-name">Accenture</div><div class="co-loc">Bengaluru, Hyderabad, Pune, Gurgaon</div></div></div></td>
+              <td><div class="role-name">Associate Software Engineer (ASE)</div><span class="sal-pill">₹4.5–6.5 LPA</span><div class="batch-tag">Batch: 2027 · BE/BTech/Any Grad</div></td>
+              <td><span class="dl-chip dl-est">📅 Oct–Nov 2026 (est.)</span></td>
+              <td><a class="apply-btn" href="https://www.accenture.com/in-en/careers/jobsearch" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(139,144,160,0.12);color:#8b90a0">IBM</div><div><div class="co-name">IBM</div><div class="co-loc">Pan India</div></div></div></td>
+              <td><div class="role-name">Associate System Engineer</div><span class="sal-pill">₹4–6 LPA</span><div class="batch-tag">Batch: 2027 · BE/BTech/BCA/BSc</div></td>
+              <td><span class="dl-chip dl-est">📅 Oct–Dec 2026 (est.)</span></td>
+              <td><a class="apply-btn" href="https://www.ibm.com/in-en/employment/entrylevel.html" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(139,144,160,0.12);color:#8b90a0">DEL</div><div><div class="co-name">Deloitte</div><div class="co-loc">Bengaluru, Hyderabad, Mumbai</div></div></div></td>
+              <td><div class="role-name">Analyst / DevOps Consultant</div><span class="sal-pill">₹6–9 LPA</span><div class="batch-tag">Batch: 2027 · BE/BTech/MBA – 60%</div></td>
+              <td><span class="dl-chip dl-est">📅 Sep–Nov 2026 (est.)</span></td>
+              <td><a class="apply-btn" href="https://www2.deloitte.com/in/en/careers/students/entry-level-students.html" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(255,95,95,0.1);color:#ff8080">ORA</div><div><div class="co-name">Oracle</div><div class="co-loc">Bengaluru, Hyderabad</div></div></div></td>
+              <td><div class="role-name">Software Developer 1 (IC1)</div><span class="sal-pill">₹8–12 LPA</span><div class="batch-tag">Batch: 2027 · CS/IT/ECE – Java/SQL</div></td>
+              <td><span class="dl-chip dl-est">📅 Oct–Dec 2026 (est.)</span></td>
+              <td><a class="apply-btn" href="https://careers.oracle.com/jobs/#en/sites/jobsearch/requisitions?keyword=fresh&location=India" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(255,95,95,0.1);color:#ff8080">QCM</div><div><div class="co-name">Qualcomm</div><div class="co-loc">Hyderabad, Bengaluru</div></div></div></td>
+              <td><div class="role-name">Engineer — Hardware / SW</div><span class="sal-pill">₹12–20 LPA</span><div class="batch-tag">Batch: 2027 · ECE/EEE/CS – VLSI/C++</div></td>
+              <td><span class="dl-chip dl-est">📅 Oct 2026–Jan 2027 (est.)</span></td>
+              <td><a class="apply-btn" href="https://careers.qualcomm.com/careers/search#/?keyword=India&type=University" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(61,255,160,0.1);color:#3dffa0">TML</div><div><div class="co-name">Tech Mahindra</div><div class="co-loc">Pan India</div></div></div></td>
+              <td><div class="role-name">Associate Software Engineer</div><span class="sal-pill">₹3.25–5 LPA</span><div class="batch-tag">Batch: 2027 · Any branch – 60%</div></td>
+              <td><span class="dl-chip dl-est">📅 Oct–Dec 2026 (est.)</span></td>
+              <td><a class="apply-btn" href="https://careers.techmahindra.com/ListOfJobs" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(255,181,71,0.1);color:#ffb547">RZP</div><div><div class="co-name">Razorpay</div><div class="co-loc">Bengaluru</div></div></div></td>
+              <td><div class="role-name">SDE / Product Engineer</div><span class="sal-pill">₹14–22 LPA</span><div class="batch-tag">Batch: 2027 · CS/IT – strong DSA</div></td>
+              <td><span class="dl-chip dl-est">📅 Jul–Sep 2026 (est.)</span></td>
+              <td><a class="apply-btn" href="https://razorpay.com/jobs/" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(255,181,71,0.1);color:#ffb547">PHP</div><div><div class="co-name">PhonePe</div><div class="co-loc">Bengaluru</div></div></div></td>
+              <td><div class="role-name">Software Engineer (Fresher)</div><span class="sal-pill">₹15–25 LPA</span><div class="batch-tag">Batch: 2027 · CS/IT/ECE</div></td>
+              <td><span class="dl-chip dl-est">📅 Aug–Oct 2026 (est.)</span></td>
+              <td><a class="apply-btn" href="https://careers.phonepe.com/" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(255,181,71,0.1);color:#ffb547">FRW</div><div><div class="co-name">Freshworks</div><div class="co-loc">Chennai, Bengaluru</div></div></div></td>
+              <td><div class="role-name">SDE / Frontend Engineer</div><span class="sal-pill">₹12–18 LPA</span><div class="batch-tag">Batch: 2027 · CS/IT</div></td>
+              <td><span class="dl-chip dl-est">📅 Aug–Oct 2026 (est.)</span></td>
+              <td><a class="apply-btn" href="https://careers.freshworks.com/" target="_blank">Apply ↗</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 4 -->
+  <div class="phase-wrap">
+    <div class="phase-card">
+      <div class="phase-hdr" onclick="tog('p4',this)">
+        <span class="phase-badge ph4">Phase 4</span>
+        <span class="phase-title">Late & Backup Drives — post-graduation</span>
+        <span class="phase-meta">Feb – May 2027 · 4 companies</span>
+        <span class="chev">▾</span>
+      </div>
+      <div class="phase-body" id="p4">
+        <div class="phase-note"><span class="note-dot"></span>If you missed earlier cycles, TCS NQT Cycle 2 and rolling walk-ins from Wipro & Accenture run year-round. Don't wait — apply parallel to earlier phases.</div>
+        <table class="dt">
+          <thead><tr><th>Company</th><th>Role & Package</th><th>Deadline</th><th>Apply</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(61,255,160,0.1);color:#3dffa0">TCS</div><div><div class="co-name">TCS</div><div class="co-loc">Pan India — iON centres</div></div></div></td>
+              <td><div class="role-name">NQT Cycle 2 (second attempt)</div><span class="sal-pill">₹3.36–9 LPA</span><div class="batch-tag">Batch: 2027 · BE/BTech – 60%</div></td>
+              <td><span class="dl-chip dl-est">📅 Feb–Mar 2027 (est.)</span></td>
+              <td><a class="apply-btn" href="https://nextstep.tcs.com/campus/" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(61,255,160,0.1);color:#3dffa0">WIP</div><div><div class="co-name">Wipro</div><div class="co-loc">Bengaluru, Chennai</div></div></div></td>
+              <td><div class="role-name">Walk-in Drives — multiple roles</div><span class="sal-pill">₹3.5–5 LPA</span><div class="batch-tag">Batch: 2025–2027 · Any degree</div></td>
+              <td><span class="dl-chip dl-open">✓ Rolling / Walk-in</span></td>
+              <td><a class="apply-btn" href="https://careers.wipro.com/careers-home/" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(108,139,255,0.1);color:#6c8bff">ACN</div><div><div class="co-name">Accenture</div><div class="co-loc">Pan India</div></div></div></td>
+              <td><div class="role-name">Customer Ops / Trust & Safety</div><span class="sal-pill">₹3.5–5 LPA</span><div class="batch-tag">Batch: 2027 · Any graduate</div></td>
+              <td><span class="dl-chip dl-open">✓ Rolling</span></td>
+              <td><a class="apply-btn" href="https://www.accenture.com/in-en/careers/jobsearch" target="_blank">Apply ↗</a></td>
+            </tr>
+            <tr>
+              <td><div class="co-cell"><div class="co-logo" style="background:rgba(108,139,255,0.1);color:#6c8bff">INFY</div><div><div class="co-name">Infosys</div><div class="co-loc">Bengaluru, Pune</div></div></div></td>
+              <td><div class="role-name">DSE Trainee (late cycle)</div><span class="sal-pill">₹6.25 LPA</span><div class="batch-tag">Batch: 2027 · BE/BTech/MCA – 60%</div></td>
+              <td><span class="dl-chip dl-est">📅 Mar–May 2027 (est.)</span></td>
+              <td><a class="apply-btn" href="https://infytq.infosys.com/" target="_blank">Apply ↗</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-drives -->
+
+<!-- ══ TAB: TIMELINE ══ -->
+<div id="tab-timeline" class="tab-panel">
+  <div class="sec-heading">Month-by-month — Jun 2026 to May 2027</div>
+  <div class="phase-card">
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-month">May–Jun 2026</div><span class="tl-now">← now</span></div>
+      <div class="tl-right">
+        <span class="tl-event hot">Amazon intern apps open</span>
+        <span class="tl-event hot">Microsoft intern open</span>
+        <span class="tl-event">Cisco apprentice — rolling</span>
+        <span class="tl-event">Philips intern — rolling</span>
+        <span class="tl-event mass">TCS NQT current cycle (Jun 14)</span>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-month">Jul–Aug 2026</div></div>
+      <div class="tl-right">
+        <span class="tl-event hot">Amazon SDE Intern 2027 deadline</span>
+        <span class="tl-event hot">Microsoft intern deadline</span>
+        <span class="tl-event">Walmart Labs intern opens</span>
+        <span class="tl-event mass">Wipro Elite NTH registration</span>
+        <span class="tl-event mass">Capgemini Exceller registration</span>
+        <span class="tl-event prod">Razorpay / Freshworks opens</span>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-month">Sep 2026</div></div>
+      <div class="tl-right">
+        <span class="tl-event mass">TCS NQT Cycle 1 exam</span>
+        <span class="tl-event mass">Capgemini Exceller test rounds</span>
+        <span class="tl-event mass">Wipro NLTH test</span>
+        <span class="tl-event mass">HCL off-campus registration</span>
+        <span class="tl-event hot">Watch Google portal — opens any day</span>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-month">Oct 2026</div></div>
+      <div class="tl-right">
+        <span class="tl-event hot">Google SWE Intern — 2–4 weeks ONLY!</span>
+        <span class="tl-event mass">Cognizant CCAT drive opens</span>
+        <span class="tl-event mass">Accenture ASE drive</span>
+        <span class="tl-event prod">PhonePe hiring</span>
+        <span class="tl-event mass">InfyTQ certification deadline</span>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-month">Nov–Dec 2026</div></div>
+      <div class="tl-right">
+        <span class="tl-event mass">IBM Associate Engineer</span>
+        <span class="tl-event mass">Deloitte Analyst hiring</span>
+        <span class="tl-event mass">Oracle SDE 1 drive</span>
+        <span class="tl-event mass">Tech Mahindra NLT</span>
+        <span class="tl-event mass">Infosys SP / DSE drive opens</span>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-month">Jan 2027</div></div>
+      <div class="tl-right">
+        <span class="tl-event mass">Qualcomm hardware / SW hiring</span>
+        <span class="tl-event mass">Infosys final rounds</span>
+        <span class="tl-event">Campus offer letters — collect</span>
+        <span class="tl-event">Backup drives begin</span>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-month">Feb–May 2027</div></div>
+      <div class="tl-right">
+        <span class="tl-event mass">TCS NQT Cycle 2 (backup)</span>
+        <span class="tl-event mass">Wipro walk-in drives</span>
+        <span class="tl-event mass">Accenture ops roles — rolling</span>
+        <span class="tl-event mass">Infosys late cycle</span>
+        <span class="tl-event">Joining & onboarding begins</span>
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-timeline -->
+
+<!-- ══ TAB: PORTALS ══ -->
+<div id="tab-portals" class="tab-panel">
+  <div class="sec-heading">Official apply portals — click to open</div>
+  <div class="links-grid">
+    <a class="link-card" href="https://nextstep.tcs.com/campus/" target="_blank">
+      <div class="link-icon" style="background:rgba(61,255,160,0.1);color:#3dffa0">TCS</div>
+      <div><div class="link-name">TCS NextStep (NQT)</div><div class="link-domain">nextstep.tcs.com</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://infytq.infosys.com/" target="_blank">
+      <div class="link-icon" style="background:rgba(108,139,255,0.1);color:#6c8bff">INFY</div>
+      <div><div class="link-name">Infosys InfyTQ</div><div class="link-domain">infytq.infosys.com</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://careers.wipro.com/careers-home/" target="_blank">
+      <div class="link-icon" style="background:rgba(61,255,160,0.1);color:#3dffa0">WIP</div>
+      <div><div class="link-name">Wipro Careers</div><div class="link-domain">careers.wipro.com</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://www.capgemini.com/in-en/careers/find-your-career/" target="_blank">
+      <div class="link-icon" style="background:rgba(139,144,160,0.12);color:#8b90a0">CAP</div>
+      <div><div class="link-name">Capgemini Careers</div><div class="link-domain">capgemini.com/in-en</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://careers.cognizant.com/global/en/students-freshers-jobs" target="_blank">
+      <div class="link-icon" style="background:rgba(108,139,255,0.1);color:#6c8bff">CTS</div>
+      <div><div class="link-name">Cognizant Students</div><div class="link-domain">careers.cognizant.com</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://www.accenture.com/in-en/careers/jobsearch" target="_blank">
+      <div class="link-icon" style="background:rgba(108,139,255,0.1);color:#6c8bff">ACN</div>
+      <div><div class="link-name">Accenture India</div><div class="link-domain">accenture.com/in-en</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://www.amazon.jobs/en/teams/internships-for-students" target="_blank">
+      <div class="link-icon" style="background:rgba(255,95,95,0.1);color:#ff8080">AMZ</div>
+      <div><div class="link-name">Amazon University Hiring</div><div class="link-domain">amazon.jobs</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://careers.google.com/students/" target="_blank">
+      <div class="link-icon" style="background:rgba(255,95,95,0.1);color:#ff8080">GOO</div>
+      <div><div class="link-name">Google Students</div><div class="link-domain">careers.google.com/students</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://careers.microsoft.com/students/us/en/india-internship" target="_blank">
+      <div class="link-icon" style="background:rgba(108,139,255,0.1);color:#6c8bff">MSF</div>
+      <div><div class="link-name">Microsoft India Intern</div><div class="link-domain">careers.microsoft.com</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://www.ibm.com/in-en/employment/entrylevel.html" target="_blank">
+      <div class="link-icon" style="background:rgba(139,144,160,0.12);color:#8b90a0">IBM</div>
+      <div><div class="link-name">IBM Entry Level</div><div class="link-domain">ibm.com/in-en</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://www2.deloitte.com/in/en/careers/students/entry-level-students.html" target="_blank">
+      <div class="link-icon" style="background:rgba(139,144,160,0.12);color:#8b90a0">DEL</div>
+      <div><div class="link-name">Deloitte India Students</div><div class="link-domain">deloitte.com/in</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://careers.oracle.com/jobs/#en/sites/jobsearch/requisitions?keyword=fresh&location=India" target="_blank">
+      <div class="link-icon" style="background:rgba(255,95,95,0.1);color:#ff8080">ORA</div>
+      <div><div class="link-name">Oracle Careers India</div><div class="link-domain">careers.oracle.com</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://careers.qualcomm.com/careers/search#/?keyword=India&type=University" target="_blank">
+      <div class="link-icon" style="background:rgba(255,95,95,0.1);color:#ff8080">QCM</div>
+      <div><div class="link-name">Qualcomm University</div><div class="link-domain">careers.qualcomm.com</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://www.hcltech.com/careers" target="_blank">
+      <div class="link-icon" style="background:rgba(61,255,160,0.1);color:#3dffa0">HCL</div>
+      <div><div class="link-name">HCL Tech Careers</div><div class="link-domain">hcltech.com/careers</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://careers.techmahindra.com/ListOfJobs" target="_blank">
+      <div class="link-icon" style="background:rgba(61,255,160,0.1);color:#3dffa0">TML</div>
+      <div><div class="link-name">Tech Mahindra Careers</div><div class="link-domain">careers.techmahindra.com</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://razorpay.com/jobs/" target="_blank">
+      <div class="link-icon" style="background:rgba(255,181,71,0.1);color:#ffb547">RZP</div>
+      <div><div class="link-name">Razorpay Jobs</div><div class="link-domain">razorpay.com/jobs</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://careers.phonepe.com/" target="_blank">
+      <div class="link-icon" style="background:rgba(255,181,71,0.1);color:#ffb547">PHP</div>
+      <div><div class="link-name">PhonePe Careers</div><div class="link-domain">careers.phonepe.com</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://careers.freshworks.com/" target="_blank">
+      <div class="link-icon" style="background:rgba(255,181,71,0.1);color:#ffb547">FRW</div>
+      <div><div class="link-name">Freshworks Careers</div><div class="link-domain">careers.freshworks.com</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://careers.walmart.com/results?q=intern+India" target="_blank">
+      <div class="link-icon" style="background:rgba(108,139,255,0.1);color:#6c8bff">WMT</div>
+      <div><div class="link-name">Walmart Labs India</div><div class="link-domain">careers.walmart.com</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://jobs.cisco.com/jobs/SearchJobs/India" target="_blank">
+      <div class="link-icon" style="background:rgba(108,139,255,0.1);color:#6c8bff">CSC</div>
+      <div><div class="link-name">Cisco Jobs India</div><div class="link-domain">jobs.cisco.com</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://www.careers.philips.com/global/en/search-results?keywords=intern+India" target="_blank">
+      <div class="link-icon" style="background:rgba(61,255,160,0.1);color:#3dffa0">PHI</div>
+      <div><div class="link-name">Philips Careers India</div><div class="link-domain">careers.philips.com</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+    <a class="link-card" href="https://offcampusjobs4u.com/2027-batch-off-campus-jobs/" target="_blank">
+      <div class="link-icon" style="background:rgba(139,144,160,0.12);color:#8b90a0">ALL</div>
+      <div><div class="link-name">All 2027 drives tracker</div><div class="link-domain">offcampusjobs4u.com</div></div>
+      <span class="link-arr">↗</span>
+    </a>
+  </div>
+</div><!-- /tab-portals -->
+
+</div><!-- /content -->
+
+<footer>2027 Batch India Off-Campus Placement Calendar · Saved May 2026 · Dates marked (est.) are projected from prior batch patterns — verify on official portals</footer>
+
+<script>
+function sw(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+}
+function tog(id, hdr) {
+  const body = document.getElementById(id);
+  const chev = hdr.querySelector('.chev');
+  const open = body.classList.contains('open');
+  body.classList.toggle('open', !open);
+  if (chev) chev.classList.toggle('open', !open);
+}
+</script>
+</body>
+</html>
