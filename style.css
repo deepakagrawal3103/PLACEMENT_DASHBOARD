@@ -2743,4 +2743,63 @@ body {
   }
 }
 
+/* ─────────────────────────────────────────────
+   PERFORMANCE & SMOOTH TRANSITIONS OVERRIDES
+───────────────────────────────────────────── */
+
+/* Drawer collapsibles smooth animations */
+#add-job-panel, #add-vault-panel {
+  display: block !important;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  margin-bottom: 0 !important;
+  border-width: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease, margin-bottom 0.4s ease, border-width 0.4s ease, padding 0.4s ease !important;
+}
+
+#add-job-panel.open, #add-vault-panel.open {
+  max-height: 900px;
+  opacity: 1;
+  margin-bottom: 2rem !important;
+  border-width: 1px !important;
+}
+
+/* Smooth Accordions for phase months */
+#calendar .phase-body {
+  overflow: hidden;
+  max-height: 0;
+  will-change: max-height;
+  transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+#calendar .phase-body.open {
+  max-height: 1500px !important;
+}
+
+/* Premium transition timing functions for interactive elements */
+.cta-btn, .apply-btn, .resource-link, .vault-btn, .tab-btn, .nav-links a {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.stat-card, .timeline-phase, .topic-card, .apt-card, .hr-card, .vault-card, .day-card {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* GPU Accelerated Reveal Scroll Animation */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(20px);
+  will-change: opacity, transform;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-on-scroll.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
 

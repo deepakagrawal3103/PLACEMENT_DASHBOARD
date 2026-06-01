@@ -457,20 +457,38 @@ const INITIAL_VAULT = [
 ];
 
 // ────────────────────────────────────────────────────────
-//  NAVBAR SCROLL EFFECT
+//  NAVBAR SCROLL EFFECT (HIGH-PERFORMANCE PASSIVE SCROLL)
 // ────────────────────────────────────────────────────────
 const navbar = document.getElementById('navbar');
 const backToTop = document.getElementById('backToTop');
 
+let scrollPending = false;
 window.addEventListener('scroll', () => {
-  if (window.scrollY > 60) {
-    navbar.classList.add('scrolled');
-    backToTop.classList.add('visible');
-  } else {
-    navbar.classList.remove('scrolled');
-    backToTop.classList.remove('visible');
+  if (!scrollPending) {
+    requestAnimationFrame(updateNavbarScroll);
+    scrollPending = true;
   }
-});
+}, { passive: true });
+
+function updateNavbarScroll() {
+  const scrollY = window.scrollY;
+  if (navbar) {
+    if (scrollY > 60) {
+      navbar.classList.add('scrolled');
+    } else {
+      navbar.classList.remove('scrolled');
+    }
+  }
+  if (backToTop) {
+    if (scrollY > 500) {
+      backToTop.classList.add('visible');
+    } else {
+      backToTop.classList.remove('visible');
+    }
+  }
+  scrollPending = false;
+}
+
 
 function scrollToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -703,8 +721,7 @@ function renderTimeline() {
 function toggleAddJobPanel() {
   const panel = document.getElementById('add-job-panel');
   if (panel) {
-    const isHidden = panel.style.display === 'none';
-    panel.style.display = isHidden ? 'block' : 'none';
+    panel.classList.toggle('open');
   }
 }
 
@@ -889,8 +906,7 @@ function renderVault() {
 function toggleAddVaultPanel() {
   const panel = document.getElementById('add-vault-panel');
   if (panel) {
-    const isHidden = panel.style.display === 'none';
-    panel.style.display = isHidden ? 'block' : 'none';
+    panel.classList.toggle('open');
   }
 }
 
@@ -1089,15 +1105,14 @@ function updateDashboardProgress() {
 //  INTERSECTION OBSERVER — FADE IN ON SCROLL
 // ────────────────────────────────────────────────────────
 const observerOptions = {
-  threshold: 0.08,
-  rootMargin: '0px 0px -50px 0px'
+  threshold: 0.05,
+  rootMargin: '0px 0px -30px 0px'
 };
 
 const fadeObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
-      entry.target.style.opacity = '1';
-      entry.target.style.transform = 'translateY(0)';
+      entry.target.classList.add('revealed');
       fadeObserver.unobserve(entry.target);
     }
   });
@@ -1124,9 +1139,9 @@ function setupEntranceObserver() {
   ];
 
   document.querySelectorAll(animatableSelectors.join(', ')).forEach((el, i) => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(20px)';
-    el.style.transition = `opacity 0.5s ease ${(i % 6) * 0.07}s, transform 0.5s ease ${(i % 6) * 0.07}s`;
+    el.classList.add('reveal-on-scroll');
+    // Stagger only transition-delay dynamically (lightweight inline style)
+    el.style.transitionDelay = `${(i % 5) * 0.05}s`;
     fadeObserver.observe(el);
   });
 }
